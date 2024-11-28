@@ -92,3 +92,6 @@ Este documento describe los pasos necesarios para levantar el backend de un proy
 ![Imagen](https://res.cloudinary.com/dsb2nqwja/image/upload/v1732800186/imagenesBack/opo1zn3orfhgbejxpxav.png)
 
 ¡Listo! Ahora el backend está levantado y funcionando correctamente.
+
+###  7. Abrir documentacion Swagger
+Una vez el proyecto este arriba en el puerto 8080 podras abrir la documentación de swagger con el siguiente link [Swagger proyecto Likes Dislikes](http://localhost:8080/swagger-ui/index.html#/)
