@@ -88,6 +88,7 @@ Este documento describe los pasos necesarios para levantar el backend de un proy
 ![Imagen](https://res.cloudinary.com/dsb2nqwja/image/upload/v1732800186/imagenesBack/sl5qgzcvlqolgqqi4wzw.png)
 
 4. Y ya con eso te subirá el proyecto del backend. Tienes que validar que en la terminal que se abre abajo automáticamente te salga el puerto en el cual está corriendo el back.
+
 ![Imagen](https://res.cloudinary.com/dsb2nqwja/image/upload/v1732800186/imagenesBack/opo1zn3orfhgbejxpxav.png)
 
 ¡Listo! Ahora el backend está levantado y funcionando correctamente.
