@@ -95,3 +95,15 @@ Este documento describe los pasos necesarios para levantar el backend de un proy
 
 ###  7. Abrir documentacion Swagger
 Una vez el proyecto este arriba en el puerto 8080 podras abrir la documentación de swagger con el siguiente link [Swagger proyecto Likes Dislikes](http://localhost:8080/swagger-ui/index.html#/)
+
+### Recomendación 
+
+Como se esta utilizando la libreria de lombok te recomiendo seguir los siguientes pasos:
+1. Le damos click al boton de hamburgesa, en la parte superior derecha.
+   ![Imagen](https://res.cloudinary.com/dsb2nqwja/image/upload/v1732800185/imagenesBack/qtovfqbshutuevpyj09j.png)
+2. Seleccionamos la siguiente ruta File -> Settings.
+![Imagen](https://res.cloudinary.com/dsb2nqwja/image/upload/v1732840375/imagenesBack/pqdipmwlqntferggld3n.png)
+3. Nos sale la siguiente interfaz. Y en el input escribimos lombok y le damos instalar.
+![Imagen](https://res.cloudinary.com/dsb2nqwja/image/upload/v1732840628/imagenesBack/lnrqrxyy3930lllq3vdu.png)
+
+Ya con esto instalado no deberian salirte errores de getters y setters.
