@@ -12,13 +12,4 @@ public class ExcepcionClase extends RuntimeException {
         super ( message );
     }
 
-    public ExcepcionClase ( Throwable cause )
-    {
-        super ( cause );
-    }
-
-    public ExcepcionClase ( String message, Throwable cause )
-    {
-        super ( message, cause );
-    }
 }

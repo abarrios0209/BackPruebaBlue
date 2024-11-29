@@ -55,7 +55,7 @@ public class PersonajesControlador {
             RespuestGenericaDto<PersonajeDto> respuesta = personajesService.obtenerPersonajeConMasLikes();
             return new ResponseEntity<>(respuesta, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Retorna 404 si no se encuentra el personaje
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

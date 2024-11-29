@@ -1,5 +1,6 @@
 package com.example.pruebaAlex.serviciosImpl;
 
+import com.example.pruebaAlex.constantes.ConstantesApp;
 import com.example.pruebaAlex.dtos.*;
 import com.example.pruebaAlex.entidades.PersonajeEntidad;
 import com.example.pruebaAlex.repositorios.PersonajeRepositorio;
@@ -8,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.Date;
 import java.util.Optional;
 
@@ -44,8 +44,56 @@ public class PersonajeServicioImpl implements PersonajesServicio {
             case 3:
                 return consumirSuperheroApi();
             default:
-                throw new IllegalArgumentException("Número aleatorio fuera de rango: " + numeroAleatorio);
+                throw new IllegalArgumentException(ConstantesApp.numeroAleatorioFueraDeRango + numeroAleatorio);
         }
+    }
+    public RespuestGenericaDto<String> darLike(PersonajeDto personajeDto) {
+        return manejarReaccion(personajeDto, true);
+    }
+
+    public RespuestGenericaDto<String> darDislike(PersonajeDto personajeDto) {
+        return manejarReaccion(personajeDto, false);
+    }
+
+    public RespuestGenericaDto<PersonajeDto> obtenerPersonajeConMasLikes() {
+        Optional<PersonajeEntidad> personajeEntidad = personajeRepository.findFirstByOrderByLikesDesc();
+        if (personajeEntidad.isPresent()) {
+            PersonajeDto personajeDto = objectMapper.convertValue(personajeEntidad.get(), PersonajeDto.class);
+            return crearRespuestaExitosa(personajeDto);
+        }
+        throw new RuntimeException(ConstantesApp.noSeEncontroUnPersonajeConMasLikes);
+    }
+
+    public RespuestGenericaDto<PersonajeDto> obtenerPersonajeConMasDislikes() {
+        Optional<PersonajeEntidad> personajeEntidad = personajeRepository.findFirstByOrderByDislikesDesc();
+        if (personajeEntidad.isPresent()) {
+            PersonajeDto personajeDto = objectMapper.convertValue(personajeEntidad.get(), PersonajeDto.class);
+            return crearRespuestaExitosa(personajeDto);
+        }
+        throw new RuntimeException(ConstantesApp.noSeEncontroUnPersonajeConMasDisLikes);
+    }
+
+    public RespuestGenericaDto<PersonajeDto> obtenerStatusPikachu( ){
+        Optional<PersonajeEntidad> personajeEntidad = personajeRepository.findById(25);
+
+        if(personajeEntidad.isPresent()){
+            PersonajeDto personajeDto = objectMapper.convertValue( personajeEntidad, PersonajeDto.class );
+            return crearRespuestaExitosa( personajeDto );
+        }
+        String url = pokeApiUrl + 25;
+        PokemonDto pokemonDto = restTemplate.getForObject(url, PokemonDto.class);
+
+        PersonajeEntidad nuevoPersonaje = new PersonajeEntidad();
+        nuevoPersonaje.setId( pokemonDto.getId() );
+        nuevoPersonaje.setName( pokemonDto.getName() );
+        nuevoPersonaje.setImage( pokemonDto.getSprites().getOther().getHome().getFrontDefault() );
+        nuevoPersonaje.setLikes( 0 );
+        nuevoPersonaje.setDislikes( 0 );
+        nuevoPersonaje.setFechaEvaluacion( new Date() );
+        PersonajeDto nuevoPersonajeDto = objectMapper.convertValue( nuevoPersonaje, PersonajeDto.class );
+        personajeRepository.save(nuevoPersonaje);
+
+        return crearRespuestaExitosa(nuevoPersonajeDto);
     }
 
     private int generarNumeroAleatorio(int max) {
@@ -91,6 +139,7 @@ public class PersonajeServicioImpl implements PersonajesServicio {
         SuperHeroeDto superHeroeDto = restTemplate.getForObject(url, SuperHeroeDto.class);
 
         PersonajeDto personajeDto = new PersonajeDto();
+        assert superHeroeDto != null;
         personajeDto.setId(superHeroeDto.getId());
         personajeDto.setName(superHeroeDto.getName());
         personajeDto.setImage(superHeroeDto.getImage().getUrl());
@@ -102,14 +151,6 @@ public class PersonajeServicioImpl implements PersonajesServicio {
         RespuestGenericaDto<T> respuesta = new RespuestGenericaDto<>();
         respuesta.successful(data);
         return respuesta;
-    }
-
-    public RespuestGenericaDto<String> darLike(PersonajeDto personajeDto) {
-        return manejarReaccion(personajeDto, true);
-    }
-
-    public RespuestGenericaDto<String> darDislike(PersonajeDto personajeDto) {
-        return manejarReaccion(personajeDto, false);
     }
 
     private RespuestGenericaDto<String> manejarReaccion(PersonajeDto personajeDto, boolean esLike) {
@@ -125,7 +166,7 @@ public class PersonajeServicioImpl implements PersonajesServicio {
             }
             personaje.setFechaEvaluacion(new Date());
             personajeRepository.save(personaje);
-            result.successful(esLike ? "Like agregado correctamente" : "Dislike agregado correctamente");
+            result.successful(esLike ? ConstantesApp.likeAgregadoCorrectamente : ConstantesApp.dislikeAgregadoCorrectamente);
         } else {
             PersonajeEntidad nuevoPersonaje = new PersonajeEntidad();
             nuevoPersonaje.setId(personajeDto.getId());
@@ -135,50 +176,10 @@ public class PersonajeServicioImpl implements PersonajesServicio {
             nuevoPersonaje.setImage( personajeDto.getImage() );
             nuevoPersonaje.setFechaEvaluacion(new Date());
             personajeRepository.save(nuevoPersonaje);
-            result.successful("Nuevo personaje creado y " + (esLike ? "like" : "dislike") + " agregado");
+            result.successful( ConstantesApp.nuevoPersonajeCreado + (esLike ? ConstantesApp.like : ConstantesApp.dislike) + ConstantesApp.agregado);
         }
 
         return result;
     }
 
-    public RespuestGenericaDto<PersonajeDto> obtenerPersonajeConMasLikes() {
-        Optional<PersonajeEntidad> personajeEntidad = personajeRepository.findFirstByOrderByLikesDesc();
-        if (personajeEntidad.isPresent()) {
-            PersonajeDto personajeDto = objectMapper.convertValue(personajeEntidad.get(), PersonajeDto.class);
-            return crearRespuestaExitosa(personajeDto);
-        }
-        throw new RuntimeException("No se encontró un personaje con más likes");
-    }
-
-    public RespuestGenericaDto<PersonajeDto> obtenerPersonajeConMasDislikes() {
-        Optional<PersonajeEntidad> personajeEntidad = personajeRepository.findFirstByOrderByDislikesDesc();
-        if (personajeEntidad.isPresent()) {
-            PersonajeDto personajeDto = objectMapper.convertValue(personajeEntidad.get(), PersonajeDto.class);
-            return crearRespuestaExitosa(personajeDto);
-        }
-        throw new RuntimeException("No se encontró un personaje con más dislikes");
-    }
-
-    public RespuestGenericaDto<PersonajeDto> obtenerStatusPikachu( ){
-        Optional<PersonajeEntidad> personajeEntidad = personajeRepository.findById(25);
-
-        if(personajeEntidad.isPresent()){
-            PersonajeDto personajeDto = objectMapper.convertValue( personajeEntidad, PersonajeDto.class );
-            return crearRespuestaExitosa( personajeDto );
-        }
-        String url = pokeApiUrl + 25;
-        PokemonDto pokemonDto = restTemplate.getForObject(url, PokemonDto.class);
-
-        PersonajeEntidad nuevoPersonaje = new PersonajeEntidad();
-        nuevoPersonaje.setId( pokemonDto.getId() );
-        nuevoPersonaje.setName( pokemonDto.getName() );
-        nuevoPersonaje.setImage( pokemonDto.getSprites().getOther().getHome().getFrontDefault() );
-        nuevoPersonaje.setLikes( 0 );
-        nuevoPersonaje.setDislikes( 0 );
-        nuevoPersonaje.setFechaEvaluacion( new Date() );
-        PersonajeDto nuevoPersonajeDto = objectMapper.convertValue( nuevoPersonaje, PersonajeDto.class );
-        personajeRepository.save(nuevoPersonaje);
-
-        return crearRespuestaExitosa(nuevoPersonajeDto);
-    }
 }
